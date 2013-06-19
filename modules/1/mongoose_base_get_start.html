@@ -25,7 +25,7 @@
         content.html('<div id="markdown-container"></div>');
         var converter = new Showdown.converter();
         $.get('../../resources/md/mongoose_base_get_start.md',function(data){
-          $('#markdown-container').html(data);
+          $('#markdown-container').html(converter.makeHtml(data));
           hljs.initHighlightingOnLoad()
         });
       });
