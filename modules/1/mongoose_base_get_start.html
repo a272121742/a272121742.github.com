@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1" />
+
+    <title>技术支持GitHub空间</title>
+    <link rel="stylesheet" href="../../libs/jqm/jquery.mobile.min.css" />
+    <link rel="stylesheet" href="../../libs/highlight/styles/monokai.css" >
+    <style type="text/css">
+      #content {
+        padding-right: 15%;
+        padding-left: 15%;
+      }
+    </style>
+    <script src="../../libs/jquery/jquery.min.js"></script>
+    <script src="../../libs/jqm/jquery.mobile.min.js"></script>
+    <script src="../../libs/markdown/showdown.js"></script>
+    <script src="../../libs/highlight/highlight.pack.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+        var content = $('#content');
+        content.html('<div id="markdown-container"></div>');
+        var converter = new Showdown.converter();
+        $.get('../../resources/md/mongoose_base_get_start.md',function(data){
+          $('#markdown-container').html(data);
+          hljs.initHighlightingOnLoad()
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div data-role="page" data-theme="a">
+      
+      <div data-role="header" data-position="fixed">
+        <h1>κiξs技ポ支歭\(≧▽≦)/</h1>
+      </div>
+
+      <div data-role="content" id="content">
+        
+      </div>
+
+      <div data-role="footer" data-position="fixed" style="text-align:center;">
+        <p>使用<a href="http://pages.github.com">GitHub Pages</a>构建</p>
+      </div>
+
+    </div>
+  </body>
+</html>
