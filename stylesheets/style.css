@@ -1,0 +1,28 @@
+html,body{
+  word-wrap:break-word;
+  word-break:break-all;
+}
+@media screen and (min-width: 1366px) {
+  #markdown-container {
+    padding-right: 17%;
+    padding-left: 17%;
+  }
+}
+@media screen and (min-width: 960px) and (max-width: 1365px) {
+  #markdown-container {
+    padding-right: 12%;
+    padding-left: 12%;
+  }
+}
+@media screen and (min-width: 480px) and (max-width: 959px) {
+  #markdown-container {
+    padding-right: 7%;
+    padding-left: 7%;
+  }
+}
+@media screen and (max-width: 479px) {
+  #content {
+    padding-right: 2%;
+    padding-left: 2%;
+  }
+}

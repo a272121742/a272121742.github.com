@@ -3,47 +3,718 @@
   <head>
 
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-
     <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1" />
 
     <title>技术支持GitHub空间</title>
     <link rel="stylesheet" href="../../libs/jqm/jquery.mobile.min.css" />
     <link rel="stylesheet" href="../../libs/highlight/styles/monokai.css" >
-    <style type="text/css">
-      html,body{
-        word-wrap:break-word;
-        word-break:break-all;
-      }
-      #content {
-        padding-right: 15%;
-        padding-left: 15%;
-      }
-    </style>
+    <link rel="stylesheet" href="../../stylesheets/style.css" >
+
     <script src="../../libs/jquery/jquery.min.js"></script>
     <script src="../../libs/jqm/jquery.mobile.min.js"></script>
-    <script src="../../libs/markdown/showdown.js"></script>
-    <script src="../../libs/highlight/highlight.pack.js"></script>
-    <script type="text/javascript">
-      $(document).ready(function(){
-        var content = $('#content');
-        content.html('<div id="markdown-container"></div>');
-        var converter = new Showdown.converter();
-        $.get('../../resources/md/mongoose_base_get_start.md',function(data){
-          $('#markdown-container').html(converter.makeHtml(data));
-          hljs.initHighlightingOnLoad()
-        });
-      });
-    </script>
+    
   </head>
   <body>
     <div data-role="page" data-theme="a">
       
       <div data-role="header" data-position="fixed">
+        <a href="../../index.html" data-icon="back">返回</a>
         <h1>κiξs技ポ支歭\(≧▽≦)/</h1>
       </div>
 
-      <div data-role="content" id="content">
-        
+      <div data-role="content">
+<div id="markdown-container"><h2 id="mongoose">Mongoose学习参考文档</h2>
+
+<p><strong>前言</strong>：本学习参考文档仅供参考，如有问题，师请雅正</p>
+
+<h2 id="">一、快速通道</h2>
+
+<h3 id="11">1.1 名词解释</h3>
+
+<ul>
+<li><p><code>Schema</code>  ：  一种以文件形式存储的数据库模型骨架，不具备数据库的操作能力</p></li>
+<li><p><code>Model</code>   ：  由<code>Schema</code>发布生成的模型，具有抽象属性和行为的数据库操作对</p></li>
+<li><p><code>Entity</code>  ：  由<code>Model</code>创建的实体，他的操作也会影响数据库</p></li>
+</ul>
+
+<p><strong>注意</strong>：</p>
+
+<p>1.本学习文档采用严格命名方式来区别不同对象，例如：</p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> PersonSchema;   <span class="comment">//Person的文本属性</span>
+    <span class="keyword">var</span> PersonModel;    <span class="comment">//Person的数据库模型</span>
+    <span class="keyword">var</span> PersonEntity;   <span class="comment">//Person实体</span>
+</code></pre>
+
+<p>2.<code>Schema</code>、<code>Model</code>、<code>Entity</code>的关系请牢记，<code>Schema</code>生成<code>Model</code>，<code>Model</code>创造<code>Entity</code>，<code>Model</code>和<code>Entity</code>都可对数据库操作造成影响，但<code>Model</code>比<code>Entity</code>更具操作性。</p>
+
+<h2 id="12">1.2 准备工作</h2>
+
+<p>1.首先你必须安装<a href="http://www.mongodb.org/">MongoDB</a>和<a href="http://nodejs.org/">NodeJS</a></p>
+
+<p>2.在项目只能够创建一个数据库连接，如下:</p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> mongoose = require(<span class="string">'mongoose'</span>);    <span class="comment">//引用mongoose模块</span>
+    <span class="keyword">var</span> db = mongoose.createConnection(<span class="string">'localhost'</span>,<span class="string">'test'</span>); <span class="comment">//创建一个数据库连接</span>
+</code></pre>
+
+<p>3.打开本机<code>localhost</code>的<code>test</code>数据库时，我们可以监测是否有异常</p>
+
+<pre><code class="javascript">    db.on(<span class="string">'error'</span>,console.error.bind(console,<span class="string">'连接错误:'</span>));
+    db.once(<span class="string">'open'</span>,<span class="keyword">function</span>(){
+      <span class="comment">//一次打开记录</span>
+    });
+</code></pre>
+
+<p><strong>注意</strong>：</p>
+
+<p>　　成功开启数据库后，就可以执行数据库相应操作，假设以下代码都在回调中处理</p>
+
+<p>4.定义一个<code>Schema</code></p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> PersonSchema = <span class="keyword">new</span> mongoose.Schema({
+      name:String   <span class="comment">//定义一个属性name，类型为String</span>
+    });
+</code></pre>
+
+<p>5.将该<code>Schema</code>发布为<code>Model</code></p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> PersonModel = db.model(<span class="string">'Person'</span>,PersonSchema);
+    <span class="comment">//如果该Model已经发布，则可以直接通过名字索引到，如下：</span>
+    <span class="comment">//var PersonModel = db.model('Person');</span>
+    <span class="comment">//如果没有发布，上一段代码将会异常</span>
+</code></pre>
+
+<p>6.用<code>Model</code>创建<code>Entity</code></p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> personEntity = <span class="keyword">new</span> PersonModel({name:<span class="string">'Krouky'</span>});
+    <span class="comment">//打印这个实体的名字看看</span>
+    console.log(personEntity.name); <span class="comment">//Krouky</span>
+</code></pre>
+
+<p>7.我们甚至可以为此<code>Schema</code>创建方法</p>
+
+<pre><code class="javascript">    <span class="comment">//为Schema模型追加speak方法</span>
+    PersonSchema.methos.speak = <span class="keyword">function</span>(){
+      console.log(<span class="string">'我的名字叫'</span>+<span class="keyword">this</span>.name);
+    }
+    <span class="keyword">var</span> PersonModel = db.model(<span class="string">'Person'</span>,PersonSchema);
+    <span class="keyword">var</span> personEntity = <span class="keyword">new</span> PersonModel({name:<span class="string">'Krouky'</span>});
+    personEntity.speak();<span class="comment">//我的名字叫Krouky</span>
+</code></pre>
+
+<p>8.<code>Entity</code>是具有具体的数据库操作<code>CRUD</code>的</p>
+
+<pre><code class="javascript">    personEntity.save();  <span class="comment">//执行完成后，数据库就有该数据了</span>
+</code></pre>
+
+<p>9.如果要执行查询，需要依赖<code>Model</code>，当然<code>Entity</code>也是可以做到的</p>
+
+<pre><code class="javascript">    PersonModel.find(<span class="keyword">function</span>(err,persons){
+      <span class="comment">//查询到的所有person</span>
+    });
+</code></pre>
+
+<p><strong>注意</strong>：</p>
+
+<p>　　1. 具体的如何配置<code>Schema</code>、<code>Model</code>以及<code>Model</code>和<code>Entity</code>的相关操作，我们会在后面进行</p>
+
+<p>　　2. <code>Model</code>和<code>Entity</code>都有能影响数据库的操作，但仍有区别，后面我们也会做解释</p>
+
+<h2 id="">二、新手指引</h2>
+
+<p>　　<em>如果您还不清楚<code>Mongoose</code>是如何工作的，请参看第一章快速通道快速浏览他的用法吧</em></p>
+
+<h3 id="1schema">1. Schema——纯洁的数据库原型</h3>
+
+<h4 id="11schema">1.1 什么是Schema</h4>
+
+<ul>
+<li>我理解<code>Schema</code>仅仅只是一断代码，他书写完成后程序依然无法使用，更无法通往数据库端</li>
+<li>他仅仅只是数据库模型在程序片段中的一种表现，或者是数据属性模型</li>
+</ul>
+
+<h4 id="12schema">1.2 如何定义Schema</h4>
+
+<pre><code class="javascript">    <span class="keyword">var</span> BlogSchema = <span class="keyword">new</span> Schema({
+      title:String,
+      author:String
+      <span class="comment">//new Schema()中传入一个JSON对象，该对象形如 xxx:yyyy ,</span>
+      /xxx是一个字符串，定义了属性，yyy是一个Schema.Type，定义了属性类型
+    });
+</code></pre>
+
+<h4 id="13schematype">1.3 什么是Schema.Type</h4>
+
+<p>　　<code>Schema.Type</code>是由<code>Mongoose</code>内定的一些数据类型，基本数据类型都在其中，他也内置了一些<code>Mongoose</code>特有的<code>Schema.Type</code>。当然，你也可以自定义<code>Schema.Type</code>，只有满足<code>Schema.Type</code>的类型才能定义在<code>Schema</code>内。</p>
+
+<h4 id="14schematypes">1.4 Schema.Types</h4>
+
+<p>　　<code>NodeJS</code>中的基本数据类型都属于<code>Schema.Type</code>，另外<code>Mongoose</code>还定义了自己的类型</p>
+
+<pre><code class="javascript">    <span class="comment">//举例：</span>
+    <span class="keyword">var</span> ExampleSchema = <span class="keyword">new</span> Schema({
+      name:String,
+      binary:Buffer,
+      living:Boolean,
+      updated:Date,
+      age:Number,
+      mixed:Schema.Types.Mixed, <span class="comment">//该混合类型等同于nested</span>
+      _id:Schema.Types.ObjectId,  <span class="comment">//主键</span>
+      _fk:Schema.Types.ObjectId,  <span class="comment">//外键</span>
+      array:[],
+      arrOfString:[String],
+      arrOfNumber:[Number],
+      arrOfDate:[Date],
+      arrOfBuffer:[Buffer],
+      arrOfBoolean:[Boolean],
+      arrOfMixed:[Schema.Types.Mixed],
+      arrOfObjectId:[Schema.Types.ObjectId]
+      nested:{
+        stuff:String,
+      }
+    });
+</code></pre>
+
+<h4 id="15buffer">1.5 关于Buffer</h4>
+
+<p>　　<code>Buffer</code>和<code>ArrayBuffer</code>是<code>Nodejs</code>两种隐藏的对象，相关内容请查看<code>NodeJS-API</code></p>
+
+<h4 id="16mixed">1.6 关于Mixed</h4>
+
+<p>　　<code>Schema.Types.Mixed</code>是<code>Mongoose</code>定义个混合类型，该混合类型如果未定义具体形式。因此,如果定义具体内容，就直接使用<code>{}</code>来定义，以下两句等价</p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> AnySchema = <span class="keyword">new</span> Schema({any:{}});
+    <span class="keyword">var</span> AnySchema = <span class="keyword">new</span> Schema({any:Schema.Types.Mixed});
+</code></pre>
+
+<p>　　混合类型因为没有特定约束，因此可以任意修改，一旦修改了原型，则必须调用<code>markModified()</code></p>
+
+<pre><code class="javascript">    person.anything = {x:[<span class="number">3</span>,<span class="number">4</span>,{y:<span class="string">'change'</span>}]}
+    person.markModified(<span class="string">'anything'</span>);<span class="comment">//传入anything，表示该属性类型发生变化</span>
+    person.save();
+</code></pre>
+
+<h4 id="17objectid">1.7 关于ObjectId</h4>
+
+<p>　　主键，一种特殊而且非常重要的类型，每个<code>Schema</code>都会默认配置这个属性，属性名为<code>_id</code>，除非自己定义，方可覆盖</p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> mongoose = require(<span class="string">'mongoose'</span>);
+    <span class="keyword">var</span> ObjectId = mongoose.Schema.Types.ObjectId;
+    <span class="keyword">var</span> StudentSchema = <span class="keyword">new</span> Schema({}); <span class="comment">//默认会有_id:ObjectId</span>
+    <span class="keyword">var</span> TeacherSchema = <span class="keyword">new</span> Schema({id:ObjectId});<span class="comment">//只有id:ObjectId</span>
+</code></pre>
+
+<p>　　该类型的值由系统自己生成，从某种意义上几乎不会重复，生成过程比较复杂，有兴趣的朋友可以查看源码。</p>
+
+<h4 id="18array">1.8 关于Array</h4>
+
+<p>　　<code>Array</code>在<code>JavaScript</code>编程语言中并不是数组，而是集合，因此里面可以存入不同的值，以下代码等价：</p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> ExampleSchema1 = <span class="keyword">new</span> Schema({array:[]});
+    <span class="keyword">var</span> ExampleSchema2 = <span class="keyword">new</span> Schema({array:Array});
+    <span class="keyword">var</span> ExampleSchema3 = <span class="keyword">new</span> Schema({array:[Schema.Types.Mixed]});
+    <span class="keyword">var</span> ExampleSchema4 = <span class="keyword">new</span> Schema({array:[{}]});
+</code></pre>
+
+<h4 id="19">1.9 附言</h4>
+
+<p>　　<code>Schema</code>不仅定义了<code>文档结构</code>和<code>使用性能</code>，还可以有<code>扩展插件</code>、<code>实例方法</code>、<code>静态方法</code>、<code>复合索引</code>、<code>文档生命周期钩子</code></p>
+
+<p>　　<code>Schema</code>可以定义插件，并且插件具有良好的可拔插性，请有兴趣的读者继续往后阅读或者查阅官方资料。</p>
+
+<h3 id="2schema">2. Schema的扩展</h3>
+
+<h4 id="21">2.1 实例方法</h4>
+
+<p>　　有的时候，我们创造的<code>Schema</code>不仅要为后面的<code>Model</code>和<code>Entity</code>提供公共的属性，还要提供公共的方法。</p>
+
+<p>　　下面例子比快速通道的例子更加高级，可以进行高级扩展：</p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> PersonSchema = <span class="keyword">new</span> Schema({name:String,type:String});
+    <span class="comment">//查询类似数据</span>
+    PersonSchema.methods.findSimilarTypes = <span class="keyword">function</span>(cb){
+      <span class="keyword">return</span> <span class="keyword">this</span>.model(<span class="string">'Person'</span>).find({type:<span class="keyword">this</span>.type},cb);
+    }
+</code></pre>
+
+<p>　　使用如下：</p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> PersonModel = mongoose.model(<span class="string">'Person'</span>,PersonSchema);
+    <span class="keyword">var</span> krouky = <span class="keyword">new</span> PersonSchema({name:<span class="string">'krouky'</span>,type:<span class="string">'前端工程师'</span>});
+    krouky.findSimilarTypes(<span class="keyword">function</span>(err,persons){
+      <span class="comment">//persons中就能查询到其他前端工程师</span>
+    });
+</code></pre>
+
+<h4 id="22">2.2 静态方法</h4>
+
+<p>　　静态方法在<code>Model</code>层就能使用，如下：</p>
+
+<pre><code class="javascript">  PersonSchema.statics.findByName = <span class="keyword">function</span>(name,cb){
+    <span class="keyword">this</span>.find({name:<span class="keyword">new</span> RegExp(name,<span class="string">'i'</span>),cb});
+  }
+  <span class="keyword">var</span> PersonModel = mongoose.model(<span class="string">'Person'</span>,PersonSchema);
+  PersonModel.findByName(<span class="string">'krouky'</span>,<span class="keyword">function</span>(err,persons){
+    <span class="comment">//找到所有名字叫krouky的人</span>
+  });
+</code></pre>
+
+<h4 id="23">2.3 索引</h4>
+
+<p>　　索引或者复合索引能让搜索更加高效，默认索引就是主键索引<code>ObjectId</code>，属性名为<code>_id</code>， <em>索引会作为一个专题来讲解</em></p>
+
+<h4 id="24">2.4 虚拟属性</h4>
+
+<p>　　<code>Schema</code>中如果定义了虚拟属性，那么该属性将不写入数据库，例如：</p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> PersonSchema = <span class="keyword">new</span> Schema({
+      name:{
+        first:String,
+        last:String
+      }
+    });
+    <span class="keyword">var</span> PersonModel = mongoose.model(<span class="string">'Person'</span>,PersonSchema);
+    <span class="keyword">var</span> krouky = <span class="keyword">new</span> PersonModel({
+      name:{first:<span class="string">'krouky'</span>,last:<span class="string">'han'</span>}
+    });
+</code></pre>
+
+<p>　　如果每次想使用全名就得这样</p>
+
+<pre><code class="javascript">    console.log(krouky.name.first + <span class="string">' '</span> + krouky.name.last);
+</code></pre>
+
+<p>　　显然这是很麻烦的，我们可以定义<code>虚拟属性</code>：</p>
+
+<pre><code class="javascript">    PersonSchema.virtual(<span class="string">'name.full'</span>).get(<span class="keyword">function</span>(){
+      <span class="keyword">return</span> <span class="keyword">this</span>.name.first + <span class="string">' '</span> + <span class="keyword">this</span>.name.last;
+    });
+</code></pre>
+
+<p>　　那么就能用<code>krouky.name.full</code>来调用全名了，反之如果知道full，也可以反解<code>first</code>和<code>last</code>属性</p>
+
+<pre><code class="javascript">    PersonSchema.virtual(<span class="string">'name.full'</span>).set(<span class="keyword">function</span>(name){
+      <span class="keyword">var</span> split = name.split(<span class="string">' '</span>);
+      <span class="keyword">this</span>.name.first = split[<span class="number">0</span>];
+      <span class="keyword">this</span>.name.last = split[<span class="number">1</span>];
+    });
+    <span class="keyword">var</span> PersonModel = mongoose.model(<span class="string">'Person'</span>,PersonSchema);
+    <span class="keyword">var</span> krouky = <span class="keyword">new</span> PersonModel({});
+    krouky.name.full = <span class="string">'krouky han'</span>;<span class="comment">//会被自动分解</span>
+    console.log(krouky.name.first);<span class="comment">//krouky</span>
+</code></pre>
+
+<h4 id="25">2.5 配置项</h4>
+
+<p>　　在使用<code>new Schema(config)</code>时，我们可以追加一个参数<code>options</code>来配置<code>Schema</code>的配置，形如：</p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> ExampleSchema = <span class="keyword">new</span> Schema(config,options);
+</code></pre>
+
+<p>　　或者使用</p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> ExampleSchema = <span class="keyword">new</span> Schema(config);
+    ExampleSchema.set(option,value);
+</code></pre>
+
+<p>　　可供配置项有：<code>safe</code>、<code>strict</code>、<code>capped</code>、<code>versionKey</code>、<code>autoIndex</code></p>
+
+<h5 id="251safe">2.5.1 safe——安全属性（默认安全）</h5>
+
+<p>　　一般可做如下配置：</p>
+
+<pre><code class="javascript">    <span class="keyword">new</span> Schema({...},{safe:<span class="literal">true</span>});
+</code></pre>
+
+<p>　　当然我们也可以这样</p>
+
+<pre><code class="javascript">    <span class="keyword">new</span> Schema({...},{safe:{j:<span class="number">1</span>,w:<span class="number">2</span>,wtimeout:<span class="number">10000</span>}});
+</code></pre>
+
+<p>　　<code>j</code>表示做1份日志，<code>w</code>表示做2个副本（尚不明确），超时时间10秒</p>
+
+<h5 id="252strict">2.5.2 strict——严格配置（默认启用）</h5>
+
+<p>　　确保<code>Entity</code>的值存入数据库前会被自动验证，如果你没有充足的理由，请不要停用，例子：</p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> ThingSchema = <span class="keyword">new</span> Schema({a:String});
+    <span class="keyword">var</span> ThingModel = db.model(<span class="string">'Thing'</span>,SchemaSchema);
+    <span class="keyword">var</span> thing = <span class="keyword">new</span> Thing({iAmNotInTheThingSchema:<span class="literal">true</span>});
+    thing.save();<span class="comment">//iAmNotInTheThingSchema这个属性将无法被存储</span>
+</code></pre>
+
+<p>　　如果取消严格选项，<code>iAmNotInTheThingSchema</code>将会被存入数据库</p>
+
+<p>　　该选项也可以在构造实例时使用，例如：</p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> ThingModel = db.model(<span class="string">'Thing'</span>);
+    <span class="keyword">var</span> thing1 = <span class="keyword">new</span> ThingModel(doc,<span class="literal">true</span>);  <span class="comment">//启用严格</span>
+    <span class="keyword">var</span> thing2 = <span class="keyword">new</span> ThingModel(doc,<span class="literal">false</span>); <span class="comment">//禁用严格</span>
+</code></pre>
+
+<p><strong>注意：</strong></p>
+
+<p>　　<code>strict</code>也可以设置为<code>throw</code>，表示出现问题将会抛出错误</p>
+
+<h5 id="253shardkey">2.5.3 shardKey</h5>
+
+<p>　　需要<code>mongodb</code>做分布式，才会使用该属性</p>
+
+<h5 id="254capped">2.5.4 capped——上限设置</h5>
+
+<p>　　如果有数据库的批量操作，该属性能限制一次操作的量，例如：</p>
+
+<pre><code class="javascript">    <span class="keyword">new</span> Schema({...},{capped:<span class="number">1024</span>});  <span class="comment">//一次操作上线1024条数据</span>
+</code></pre>
+
+<p>　　当然该参数也可是JSON对象，包含size、max、autiIndexId属性</p>
+
+<pre><code class="javascript">    <span class="keyword">new</span> Schema({...},{capped:{size:<span class="number">1024</span>,max:<span class="number">100</span>,autoIndexId:<span class="literal">true</span>}});
+</code></pre>
+
+<h5 id="255versionkey">2.5.5 versionKey——版本锁</h5>
+
+<p>　　版本锁是<code>Mongoose</code>默认配置（__v属性）的，如果你想自己定制，如下：</p>
+
+<pre><code class="javascript">    <span class="keyword">new</span> Schema({...},{versionKey:<span class="string">'__someElse'</span>});
+</code></pre>
+
+<p>　　此时存入数据库的版本锁就不是<code>__v</code>属性，而是<code>__someElse</code>，相当于是给版本锁取名字。</p>
+
+<p>　　具体怎么存入都是由<code>Mongoose</code>和<code>MongoDB</code>自己决定，当然，这个属性你也可以去除</p>
+
+<pre><code class="javascript">  <span class="keyword">new</span> Schema({...},{versionKey:<span class="literal">false</span>});
+</code></pre>
+
+<p>　　除非你知道你在做什么，并且你知道这样做的后果</p>
+
+<h5 id="256autoindex">2.5.6 autoIndex——自动索引</h5>
+
+<p>　　<em>该内容将在索引章节单独讲解</em></p>
+
+<h3 id="3documents">3. Documents</h3>
+
+<p>　　<code>Document</code>是与<code>MongoDB</code>文档一一对应的模型，<code>Document</code>可等同于<code>Entity</code>，具有属性和操作性</p>
+
+<p><strong>注意：</strong></p>
+
+<p>　　<code>Document</code>的`CRUD都必须经过严格验证的，参看<strong>2.5.2 Schema的strict严格配置</strong></p>
+
+<h4 id="31">3.1 查询</h4>
+
+<p>　　查询内容过多，专题讲解</p>
+
+<h4 id="32">3.2 更新</h4>
+
+<p>　　有许多方式来更新文件，以下是常用的传统方式：</p>
+
+<pre><code class="javascript">    PersonModel.findById(id,<span class="keyword">function</span>(err,person){
+      person.name = <span class="string">'MDragon'</span>;
+      person.save(<span class="keyword">function</span>(err){});
+    });
+</code></pre>
+
+<p>　　这里，利用<code>Model</code>模型查询到了<code>person</code>对象，该对象属于<code>Entity</code>，可以有<code>save操作，如果使用</code>Model`操作，需注意：</p>
+
+<pre><code class="javascript">    PersonModel.findById(id,<span class="keyword">function</span>(err,person){
+      person.name = <span class="string">'MDragon'</span>;
+      <span class="keyword">var</span> _id = person._id; <span class="comment">//需要取出主键_id</span>
+      <span class="keyword">delete</span> person._id;    <span class="comment">//再将其删除</span>
+      PersonModel.update({_id:_id},person,<span class="keyword">function</span>(err){});
+      <span class="comment">//此时才能用Model操作，否则报错</span>
+    });
+</code></pre>
+
+<p>　　<code>update</code>第一个参数是查询条件，第二个参数是更新的对象，但不能更新主键，这就是为什么要删除主键的原因。</p>
+
+<p>　　当然这样的更新很麻烦，可以使用<code>$set</code>属性来配置，这样也不用先查询，如果更新的数据比较少，可用性还是很好的：</p>
+
+<pre><code class="javascript">    PersonModel.update({_id:_id},{$set:{name:<span class="string">'MDragon'</span>}},<span class="keyword">function</span>(err){});
+</code></pre>
+
+<p>　　需要注意，<code>Document</code>的<code>CRUD</code>操作都是异步执行，<code>callback</code>第一个参数必须是<code>err</code>，而第二个参数各个方法不一样，<code>update</code>的<code>callback</code>第二个参数是更新的数量，如果要返回更新后的对象，则要使用如下方法</p>
+
+<pre><code class="javascript">    Person.findByIdAndUpdate(_id,{$set:{name:<span class="string">'MDragon'</span>}},<span class="keyword">function</span>(err,person){
+      console.log(person.name); <span class="comment">//MDragon</span>
+    });
+</code></pre>
+
+<p>　　类似的方法还有<code>findByIdAndRemove</code>，如同名字，只能根据id查询并作<code>update</code>/<code>remove</code>操作，操作的数据仅一条</p>
+
+<h4 id="33">3.3 新增</h4>
+
+<p>　　如果是<code>Entity</code>，使用<code>save</code>方法，如果是<code>Model</code>，使用<code>create</code>方法</p>
+
+<pre><code class="javascript">    <span class="comment">//使用Entity来增加一条数据</span>
+    <span class="keyword">var</span> krouky = <span class="keyword">new</span> PersonModel({name:<span class="string">'krouky'</span>});
+    krouky.save(callback);
+    <span class="comment">//使用Model来增加一条数据</span>
+    <span class="keyword">var</span> MDragon = {name:<span class="string">'MDragon'</span>};
+    PersonModel.create(MDragon,callback);
+</code></pre>
+
+<p>　　两种新增方法区别在于，如果使用<code>Model</code>新增时，传入的对象只能是纯净的<code>JSON</code>对象，不能是由<code>Model</code>创建的实体，原因是：由<code>Model</code>创建的实体<code>krouky</code>虽然打印是只有<code>{name:'krouky'}</code>，但是<code>krouky</code>属于<code>Entity</code>，包含有<code>Schema</code>属性和<code>Model</code>数据库行为模型。如果是使用<code>Model</code>创建的对象，传入时一定会将隐藏属性也存入数据库，虽然<code>3.x</code>追加了默认严格属性，但也不必要增加操作的报错</p>
+
+<h4 id="34">3.4 删除</h4>
+
+<p>　　和新增一样，删除也有2种方式，但<code>Entity</code>和<code>Model</code>都使用<code>remove</code>方法</p>
+
+<h3 id="4subdocs">4.Sub Docs</h3>
+
+<p>　　如同<code>SQL</code>数据库中2张表有主外关系，<code>Mongoose</code>将2个<code>Document</code>的嵌套叫做<code>Sub-Docs</code>（子文档）</p>
+
+<p>　　简单的说就是一个<code>Document</code>嵌套另外一个<code>Document</code>或者<code>Documents</code>:</p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> ChildSchema1 = <span class="keyword">new</span> Schema({name:String});
+    <span class="keyword">var</span> ChildSchema2 = <span class="keyword">new</span> Schema({name:String});
+    <span class="keyword">var</span> ParentSchema = <span class="keyword">new</span> Schema({
+      children1:ChildSchema1,   <span class="comment">//嵌套Document</span>
+      children2:[ChildSchema2]  <span class="comment">//嵌套Documents</span>
+    });
+</code></pre>
+
+<p>　　<code>Sub-Docs</code>享受和<code>Documents</code>一样的操作，但是<code>Sub-Docs</code>的操作都由父类去执行</p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> ParentModel = db.model(<span class="string">'Parent'</span>,parentSchema);
+    <span class="keyword">var</span> parent = <span class="keyword">new</span> ParentModel({
+      children2:[{name:<span class="string">'c1'</span>},{name:<span class="string">'c2'</span>}]
+    });
+    parent.children2[<span class="number">0</span>].name = <span class="string">'d'</span>;
+    parent.save(callback);
+</code></pre>
+
+<p>　　<code>parent</code>在执行保存时，由于包含<code>children2</code>，他是一个数据库模型对象，因此会先保存<code>chilren2[0]</code>和<code>chilren2[1]</code>。</p>
+
+<p>　　如果子文档在更新时出现错误，将直接报在父类文档中，可以这样处理：</p>
+
+<pre><code class="javascript">    ChildrenSchema.pre(<span class="string">'save'</span>,<span class="keyword">function</span>(next){
+      <span class="keyword">if</span>(<span class="string">'x'</span> === <span class="keyword">this</span>.name) <span class="keyword">return</span> next(<span class="keyword">new</span> Error(<span class="string">'#err:not-x'</span>));
+      next();
+    });
+    <span class="keyword">var</span> parent = <span class="keyword">new</span> ParentModel({children1:{name:<span class="string">'not-x'</span>}});
+    parent.save(<span class="keyword">function</span>(err){
+      console.log(err.message); <span class="comment">//#err:not-x</span>
+    });
+</code></pre>
+
+<h4 id="41">4.1 查询子文档</h4>
+
+<p>　　如果<code>children</code>是<code>parent</code>的子文档，可以通过如下方法查询到<code>children</code></p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> child = parent.children.id(id);
+</code></pre>
+
+<h4 id="42">4.2 新增、删除、更新</h4>
+
+<p>　　子文档是父文档的一个属性，因此按照属性的操作即可，不同的是在新增父类的时候，子文档是会被先加入进去的。</p>
+
+<p>　　如果<code>ChildrenSchema</code>是临时的一个子文档，不作为数据库映射集合，可以这样：</p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> ParentSchema = <span class="keyword">new</span> Schema({
+      children:{
+        name:String
+      }
+    });
+    <span class="comment">//其实就是匿名混合模式</span>
+</code></pre>
+
+<h3 id="5model">5.Model</h3>
+
+<h4 id="51model">5.1 什么是Model</h4>
+
+<p>　　<code>Model</code>模型，是经过<code>Schema</code>构造来的，除了<code>Schema</code>定义的数据库骨架以外，还具有数据库行为模型，他相当于管理数据库属性、行为的类</p>
+
+<h4 id="52model">5.2 如何创建Model</h4>
+
+<p>　　你必须通过<code>Schema</code>来创建，如下：</p>
+
+<pre><code class="javascript">    <span class="comment">//先创建Schema</span>
+    <span class="keyword">var</span> TankSchema = <span class="keyword">new</span> Schema({
+      name:<span class="string">'String'</span>,
+      size:<span class="string">'String'</span> 
+    });
+    <span class="comment">//通过Schema创建Model</span>
+    <span class="keyword">var</span> TankModel = mongoose.model(<span class="string">'Tank'</span>,TankSchema);
+</code></pre>
+
+<h4 id="52model">5.2 操作Model</h4>
+
+<p>　　该模型就能直接拿来操作，具体查看<code>API</code>，例如：</p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> tank = {<span class="string">'something'</span>,size:<span class="string">'small'</span>};
+    TankModel.create(tank);
+</code></pre>
+
+<p><strong>注意：</strong></p>
+
+<p>　　你可以使用<code>Model</code>来创建<code>Entity</code>，<code>Entity</code>实体是一个特有<code>Model</code>具体对象，但是他并不具备<code>Model</code>的方法，只能用自己的方法。</p>
+
+<pre><code class="javascript">  <span class="comment">//通过Model创建Entity</span>
+  <span class="keyword">var</span> tankEntity = <span class="keyword">new</span> TankModel(<span class="string">'someother'</span>,<span class="string">'size:big'</span>);
+  tankEntity.save();
+</code></pre>
+
+<h3 id="6query">6.Query</h3>
+
+<p>　　查询是数据库中运用最多也是最麻烦的地方，这里对<code>Query</code>解读的并不完善，仅仅是自己的一点领悟而已。</p>
+
+<h4 id="61">6.1 查询的方式</h4>
+
+<p>　　通常有2种查询方式，一种是<code>直接查询</code>，一种是<code>链式查询</code>（2种查询都是自己命名的）</p>
+
+<h5 id="611">6.1.1 直接查询</h5>
+
+<p>　　在查询时带有回调函数的，称之为直接查询，查询的条件往往通过<code>API</code>来设定，例如：</p>
+
+<pre><code class="javascript">    PersonModel.findOne({<span class="string">'name.last'</span>:<span class="string">'dragon'</span>},<span class="string">'some select'</span>,<span class="keyword">function</span>(err,person){
+      <span class="comment">//如果err==null，则person就能取到数据</span>
+    });
+</code></pre>
+
+<p>　　具体的查询参数，请查询<code>API</code></p>
+
+<h5 id="612">6.1.2 链式查询</h5>
+
+<p>　　在查询时候，不带回调，而查询条件通过<code>API</code>函数来制定，例如：</p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> query = PersonModel.findOne({<span class="string">'name.last'</span>:<span class="string">'dragon'</span>});
+    query.select(<span class="string">'some select'</span>);
+    query.exec(<span class="keyword">function</span>(err,pserson){
+    <span class="comment">//如果err==null，则person就能取到数据</span>
+  });
+</code></pre>
+
+<p>　　这种方式相对直接查询，分的比较明细，如果不带<code>callback</code>，则返回<code>query</code>，<code>query</code>没有执行的预编译查询语句，该<code>query</code>对象执行的方法都将返回自己，只有在执行<code>exec</code>方法时才执行查询，而且必须有回调。</p>
+
+<p>　　因为<code>query</code>的操作始终返回自身，我们可以采用更形象的链式写法</p>
+
+<pre><code class="javascript">    Person
+      .find({ occupation: <span class="regexp">/host/</span> })
+      .where(<span class="string">'name.last'</span>).equals(<span class="string">'Ghost'</span>)
+      .where(<span class="string">'age'</span>).gt(<span class="number">17</span>).lt(<span class="number">66</span>)
+      .where(<span class="string">'likes'</span>).<span class="keyword">in</span>([<span class="string">'vaporizing'</span>, <span class="string">'talking'</span>])
+      .limit(<span class="number">10</span>)
+      .sort(<span class="string">'-occupation'</span>)
+      .select(<span class="string">'name occupation'</span>)
+      .exec(callback);
+</code></pre>
+
+<h3 id="7validation">7.Validation</h3>
+
+<p>　　数据的存储是需要验证的，不是什么数据都能往数据库里丢或者显示到客户端的，数据的验证需要记住以下规则：</p>
+
+<ul>
+<li>验证始终定义在<code>SchemaType</code>中</li>
+<li>验证是一个内部中间件</li>
+<li>验证是在一个<code>Document</code>被保存时默认启用的，除非你关闭验证</li>
+<li>验证是异步递归的，如果你的<code>SubDoc</code>验证失败，<code>Document</code>也将无法保存</li>
+<li>验证并不关心错误类型，而通过<code>ValidationError</code>这个对象可以访问</li>
+</ul>
+
+<h4 id="71">7.1 验证器</h4>
+
+<ol>
+<li><code>required</code> 非空验证</li>
+<li><code>min</code>/<code>max</code> 范围验证（边值验证）</li>
+<li><code>enum</code>/<code>match</code> 枚举验证/匹配验证</li>
+<li><p><code>validate</code> 自定义验证规则</p>
+
+<p>　　以下是综合案例：</p></li>
+</ol>
+
+<pre><code class="javascript">    <span class="keyword">var</span> PersonSchema = <span class="keyword">new</span> Schema({
+      name:{
+        type:<span class="string">'String'</span>,
+        required:<span class="literal">true</span> <span class="comment">//姓名非空</span>
+      },
+      age:{
+        type:<span class="string">'Nunmer'</span>,
+        min:<span class="number">18</span>,       <span class="comment">//年龄最小18</span>
+        max:<span class="number">120</span>     <span class="comment">//年龄最大120</span>
+      },
+      city:{
+        type:<span class="string">'String'</span>,
+        enum:[<span class="string">'北京'</span>,<span class="string">'上海'</span>]  <span class="comment">//只能是北京、上海人</span>
+      },
+      other:{
+        type:<span class="string">'String'</span>,
+        validate:[validator,err]  <span class="comment">//validator是一个验证函数，err是验证失败的错误信息</span>
+      }
+    });
+</code></pre>
+
+<h4 id="72">7.2 验证失败</h4>
+
+<p>　　如果验证失败，则会返回<code>err</code>信息，<code>err</code>是一个对象该对象属性如下</p>
+
+<pre><code class="javascript">    err.errors                <span class="comment">//错误集合（对象）</span>
+    err.errors.color          <span class="comment">//错误属性(Schema的color属性)</span>
+    err.errors.color.message  <span class="comment">//错误属性信息</span>
+    err.errors.path             <span class="comment">//错误属性路径</span>
+    err.errors.type             <span class="comment">//错误类型</span>
+    err.name                <span class="comment">//错误名称</span>
+    err.message                 <span class="comment">//错误消息</span>
+</code></pre>
+
+<p>　　一旦验证失败，<code>Model</code>和<code>Entity</code>都将具有和<code>err</code>一样的<code>errors</code>属性</p>
+
+<h3 id="8middleware">8.Middleware中间件</h3>
+
+<h4 id="81">8.1 什么是中间件</h4>
+
+<p>　　中间件是一种控制函数，类似插件，能控制流程中的<code>init</code>、validate<code>、</code>save<code>、</code>remove`方法</p>
+
+<h4 id="82">8.2 中间件的分类</h4>
+
+<p>　　中间件分为两类</p>
+
+<h5 id="821serial">8.2.1 Serial串行</h5>
+
+<p>　　串行使用<code>pre</code>方法，执行下一个方法使用<code>next</code>调用</p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> schema = <span class="keyword">new</span> Schema(...);
+    schema.pre(<span class="string">'save'</span>,<span class="keyword">function</span>(next){
+      <span class="comment">//做点什么</span>
+      next();
+    });
+</code></pre>
+
+<h5 id="822parallel">8.2.2 Parallel并行</h5>
+
+<p>　　并行提供更细粒度的操作</p>
+
+<pre><code class="javascript">    <span class="keyword">var</span> schema = <span class="keyword">new</span> Schema(...);
+    schema.pre(<span class="string">'save'</span>,<span class="keyword">function</span>(next,done){
+      <span class="comment">//下一个要执行的中间件并行执行</span>
+      next();
+      doAsync(done);
+    });
+</code></pre>
+
+<h4 id="83">8.3 中间件特点</h4>
+
+<p>　　一旦定义了中间件，就会在全部中间件执行完后执行其他操作，使用中间件可以雾化模型，避免异步操作的层层迭代嵌套</p>
+
+<h4 id="84">8.4 使用范畴</h4>
+
+<ol>
+<li>复杂的验证</li>
+<li>删除有主外关联的<code>doc</code></li>
+<li>异步默认</li>
+<li><p>某个特定动作触发异步任务，例如触发自定义事件和通知</p>
+
+<p>　　例如，可以用来做自定义错误处理</p></li>
+</ol>
+
+<pre><code class="javascript">    schema.pre(<span class="string">'save'</span>,<span class="keyword">function</span>(next){
+      <span class="keyword">var</span> err = <span class="keyword">new</span> Eerror(<span class="string">'some err'</span>);
+      next(err);
+    });
+    entity.save(<span class="keyword">function</span>(err){
+      console.log(err.message); <span class="comment">//some err</span>
+    });
+</code></pre></div>        
       </div>
 
       <div data-role="footer" data-position="fixed" style="text-align:center;">
