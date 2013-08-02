@@ -13,6 +13,20 @@
     <script src="../../libs/jquery/jquery.min.js"></script>
     <script src="../../libs/jqm/jquery.mobile.min.js"></script>
     <script type="text/javascript">
+      function resize(){
+        $('.container .line').each(function(){
+            var t = $(this);
+            var h = $(this).height();
+            var l = t.parents('tr').find('.gutter div[class="'+t.attr('class')+'"]');
+            l.height(h);
+          });
+      };
+      $(document).ready(function(){
+          resize();
+        $(window).resize(function(){
+          resize();
+        });
+      });
     </script>
   </head>
   <body>
