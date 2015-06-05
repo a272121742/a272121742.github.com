@@ -194,7 +194,8 @@
             .attr('transform','translate('+waveGroupXPosition+','+waveRiseScale(newFillPercent)+')')
             .each("start", function(){ wave.attr('transform','translate(1,0)'); });
         value = newValue;
-    };
+      };
+      return gauge;
   };
 </script>
 <script language="JavaScript">
