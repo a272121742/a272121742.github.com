@@ -3,14 +3,24 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title></title>
-    <script src="/libs/d3/d3.v3.min.js" language="JavaScript"></script>
-    <script src="/libs/underscore/underscore.min.js" language="JavaScript"></script>
+    <script src="../../libs/d3/d3.v3.min.js" language="JavaScript"></script>
+    <script src="../../libs/underscore/underscore.min.js" language="JavaScript"></script>
     <style>
         .liquidFillGaugeText { font-family: Helvetica; font-weight: bold; }
     </style>
 </head>
 <body>
-<button id="up">液位增加</button><button id="down">液位降低</button>
+<button id="up">液位增加</button>
+<button id="down">液位降低</button>
+<button id="left">反向</button>
+<button id="stop">停止</button>
+<button id="right">正向</button>
+<button id="wtup">水温上升</button>
+<button id="wtrest">水温还原</button>
+<button id="wtdown">水温下降</button>
+<button id="atup">气温上升</button>
+<button id="atrest">气温还原</button>
+<button id="atdown">气温下降</button>
 <svg id="fillgauge1" width="97%" height="250"></svg>
 <script type="text/javascript">
 var LfgUtil = (function(){
@@ -25,10 +35,10 @@ var LfgUtil = (function(){
         waveHeight: 0.05, 
         waveCount: 1,
         waveRiseTime: 1000,
-        waveAnimateTime: 18000,
+        waveAnimateTime: 3000,
         waveRise: true,
         waveHeightScaling: true,
-        waveAnimate: true,
+        waveAnimate: 1,
         waveColor: "#178BCA", 
         waveOffset: 0, 
         textVertPosition: .5,
@@ -97,7 +107,6 @@ var LfgUtil = (function(){
       var waveAnimateScale = d3.scale.linear()
           .range([0, waveClipWidth-fillCircleRadius*2]) // Push the clip area one full wave then snap back.
           .domain([0,1]);
-
       var textRiseScaleY = d3.scale.linear()
           .range([fillCircleMargin+fillCircleRadius*2,(fillCircleMargin+textPixels*0.7)])
           .domain([0,1]);
@@ -156,7 +165,7 @@ var LfgUtil = (function(){
 
       animateValueCountUp(value);
       animateWaveHeight(0, value);
-      animateWave();
+      animateWave(config.waveAnimate);
 
       
 
@@ -188,23 +197,53 @@ var LfgUtil = (function(){
             waveGroup.attr('transform','translate('+waveGroupXPosition+','+waveRiseScale(toFillPercent)+')');
         }
       };
-      function animateWave() {
-        if(config.waveAnimate){
+      function animateWave(waveAnimate) {
+        if(waveAnimate){
           wave.transition()
               .duration(config.waveAnimateTime)
               .ease("linear")
-              .attr('transform','translate('+waveAnimateScale(1)+',0)')
+              .attr('transform','translate('+waveAnimateScale(0.5 + waveAnimate * 0.5)+',0)')
               .each("end", function(){
-                  wave.attr('transform','translate('+waveAnimateScale(0)+',0)');
-                  animateWave(config.waveAnimateTime);
+                  wave.attr('transform','translate('+waveAnimateScale(0.5 - waveAnimate * 0.5)+',0)');
+                  if(waveAnimate)animateWave(config.waveAnimate);
               });
-        };
-          
+        }
       }
       gauge.changeValue = function(newValue){
         animateValueCountUp(newValue);
         animateWaveHeight(value, newValue);
         value = newValue;
+      };
+      gauge.waveAnimate = function(value){
+        if(value > 0){
+          config.waveAnimate = 1;
+          animateWave(1);
+        }else if(value < 0){
+          config.waveAnimate = -1;
+          animateWave(-1);
+        }else{
+          config.waveAnimate = 0;
+          console.log(0);
+          animateWave(0);
+        }
+      };
+      gauge.wtAnimate = function(value){
+        if(value > 0){
+          fillCircleGroup.select('circle').transition().duration(3000).style('fill','red');
+        }else if(value < 0){
+          fillCircleGroup.select('circle').transition().duration(3000).style('fill','blue');
+        }else{
+          fillCircleGroup.select('circle').transition().duration(3000).style('fill',config.waveColor);
+        }
+      };
+      gauge.atAnimate = function(value){
+        if(value > 0){
+          gaugeGroup.select('path').transition().duration(3000).style('fill','red');
+        }else if(value < 0){
+          gaugeGroup.select('path').transition().duration(3000).style('fill','blue');
+        }else{
+          gaugeGroup.select('path').transition().duration(3000).style('fill',config.circleColor);
+        }
       };
       return gauge;
     }
@@ -222,6 +261,33 @@ var LfgUtil = (function(){
   d3.select('#down').on('click', function(){
     defaultValue -= 10;
     lgf.changeValue(defaultValue);
+  });
+  d3.select('#left').on('click', function(){
+    lgf.waveAnimate(-1);
+  });
+  d3.select('#stop').on('click', function(){
+    lgf.waveAnimate(0);
+  });
+  d3.select('#right').on('click', function(){
+    lgf.waveAnimate(1);
+  });
+  d3.select('#wtup').on('click', function(){
+    lgf.wtAnimate(1);
+  });
+  d3.select('#wtrest').on('click', function(){
+    lgf.wtAnimate(0);
+  });
+  d3.select('#wtdown').on('click', function(){
+    lgf.wtAnimate(-1);
+  });
+  d3.select('#atup').on('click', function(){
+    lgf.atAnimate(1);
+  });
+  d3.select('#atrest').on('click', function(){
+    lgf.atAnimate(0);
+  });
+  d3.select('#atdown').on('click', function(){
+    lgf.atAnimate(-1);
   });
 </script>
 </body>
