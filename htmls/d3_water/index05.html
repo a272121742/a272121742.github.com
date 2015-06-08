@@ -21,6 +21,8 @@
 <button id="atup">气温上升</button>
 <button id="atrest">气温还原</button>
 <button id="atdown">气温下降</button>
+<button id="end">停止</button>
+<button id="begin">启动</button>
 <svg id="fillgauge1" width="97%" height="250"></svg>
 <script type="text/javascript">
 var LfgUtil = (function(){
@@ -150,7 +152,6 @@ var LfgUtil = (function(){
                               .attr('dur', '2000ms')
                               .attr('begin', 'indefinite')
                               .attr('fill','freeze')
-                              .attr('restart','never')
                               .attr('additive','sum')
                               .attr('repeatCount', 'indefinite')[0][0];
 
@@ -255,14 +256,13 @@ var LfgUtil = (function(){
           gaugeGroup.select('path').transition().duration(3000).style('fill',config.circleColor);
         }
       };
-      gauge.stop = function(v){
-        if(v % 2 == 0){
-          waveAnimateEl.endElement();
-        }else{
-          waveAnimateEl.beginElement();
-        }
-        
-      }
+      gauge.end = function(){
+        waveAnimateEl.endElement();
+          
+      };
+      gauge.begin = function(){
+        waveAnimateEl.beginElement();
+      };
       return gauge;
     }
   }
@@ -284,10 +284,7 @@ var LfgUtil = (function(){
     lgf.waveAnimate(-1);
   });
   d3.select('#stop').on('click', function(){
-    if(!window.a){
-      window.a = 1;
-    }
-    lgf.stop(++window.a);
+    lgf.waveAnimate(0);
   });
   d3.select('#right').on('click', function(){
     lgf.waveAnimate(1);
@@ -309,6 +306,12 @@ var LfgUtil = (function(){
   });
   d3.select('#atdown').on('click', function(){
     lgf.atAnimate(-1);
+  });
+  d3.select('#end').on('click', function(){
+    lgf.end();
+  });
+  d3.select('#begin').on('click', function(){
+    lgf.begin();
   });
 </script>
 </body>
