@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../../libs/d3/d3.v3.min.js" language="JavaScript"></script>
+    <script src="../../libs/underscore/underscore.min.js" language="JavaScript"></script>
+    <style>
+        @keyframes 'cssAnimate' {
+          to {
+            stroke-dashoffset : 60;
+          }
+        }
+        @-webkit-keyframes 'cssAnimate' {
+          to {
+            stroke-dashoffset : 60;
+          }
+        }
+        @-moz-keyframes 'cssAnimate' {
+          to {
+            stroke-dashoffset : 60;
+          }
+        }
+        @-o-keyframes 'cssAnimate' {
+          to {
+            stroke-dashoffset : 60;
+          }
+        }
+        @-ms-keyframes 'cssAnimate' {
+          to {
+            stroke-dashoffset : 60;
+          }
+        }
+        .animate-line {
+          animation : 'cssAnimate' 1s linear infinite;
+          -webkit-animation : 'cssAnimate' 1s linear infinite;
+          -moz-animation : 'cssAnimate' 1s linear infinite;
+          -o-animation : 'cssAnimate' 1s linear infinite;
+          -ms-animation : 'cssAnimate' 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+<h3 style="color:red">
+  SVG原生动画（红线）&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <button id="svgEnd">停止</button>
+  <button id="svgBegin">启动</button>
+</h3>
+
+<h3 style="color:blue">
+  CSS原生动画（蓝线）&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <button id="cssEnd">停止</button>
+  <button id="cssBegin">启动</button>
+</h3>
+
+<h3 style="color:orange">
+  JS脚本动画（橙线）&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <button id="jsEnd">停止</button>
+  <button id="jsBegin">启动</button>
+</h3>
+
+<svg id="line1" width="100%" height="5"></svg>
+<svg id="line2" width="100%" height="5"></svg>
+<svg id="line3" width="100%" height="5"></svg>
+<script type="text/javascript">
+var browserPrefix = (function(){
+  var result = '-webkit-';
+  var N = navigator.appName, ua = navigator.userAgent, tem;
+  var M = ua.match(/(opera|chrome|safari|firefox|msie)\/?\s*(\.?\d+(\.\d+)*)/i);
+  if(M && (tem = ua.match(/version\/([\.\d]+)/i))!= null) M[2] = tem[1];
+  M = M? [M[1], M[2]]: [N, navigator.appVersion,'-?'];
+  M = M[0];
+  if(M == "Chrome") { result = "-webkit-"; }
+  else if(M == "Firefox") { result = "-moz-"; }
+  else if(M == "Safari") { result = "-webkit-"; }
+  else if(M == "MSIE") { result = "-ms-"; }
+  else{result = '-o-'}
+  return result;
+})();
+(function() {
+    var lastTime = 0;
+    var vendors = ['webkit', 'moz'];
+    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+        window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+        window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] ||    // Webkit中此取消方法的名字变了
+                                      window[vendors[x] + 'CancelRequestAnimationFrame'];
+    }
+
+    if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = function(callback, element) {
+            var currTime = new Date().getTime();
+            var timeToCall = Math.max(0, 16.7 - (currTime - lastTime));
+            var id = window.setTimeout(function() {
+                callback(currTime + timeToCall);
+            }, timeToCall);
+            lastTime = currTime + timeToCall;
+            return id;
+        };
+    }
+    if (!window.cancelAnimationFrame) {
+        window.cancelAnimationFrame = function(id) {
+            clearTimeout(id);
+        };
+    }
+}());
+var line1 = d3.select('#line1').append('line')
+                               .attr('x1', 0)
+                               .attr('y1', 0)
+                               .attr('x2', '100%')
+                               .attr('y2', 0)
+                               .attr('stroke', 'red')
+                               .attr('stroke-width', 5)
+                               .attr('stroke-dasharray', '50,10');
+var line1Animate = line1.append('animate')
+     .attr('id', 'line1Animate')
+     .attr('attributeName', 'stroke-dashoffset')
+     .attr('from', 0)
+     .attr('to', 60)
+     .attr('dur', '1000ms')
+     .attr('fill', 'freeze')
+     .attr('repeatCount', 'indefinite');
+var line2 = d3.select('#line2').append('line')
+                               .attr('x1', 0)
+                               .attr('y1', 0)
+                               .attr('x2', '100%')
+                               .attr('y2', 0)
+                               .attr('stroke', 'blue')
+                               .attr('stroke-width', 5)
+                               .attr('stroke-dasharray', '50,10')
+                               .attr('class', 'animate-line');
+var line3 = d3.select('#line3').append('line')
+                               .attr('x1', 0)
+                               .attr('y1', 0)
+                               .attr('x2', '100%')
+                               .attr('y2', 0)
+                               .attr('stroke', 'orange')
+                               .attr('stroke-width', 5)
+                               .attr('stroke-dasharray', '50,10');
+
+function line3Animation(){
+  var selfFn = arguments.callee;
+  if(selfFn.running){
+    if(!selfFn.i){
+      selfFn.i = 0;
+    }
+    line3.style('stroke-dashoffset', ++selfFn.i % 60);
+    line3Animation.animationId = requestAnimationFrame(selfFn);
+  }
+};
+line3Animation.running = true;
+requestAnimationFrame(line3Animation);
+
+
+d3.select('#svgEnd').on('click', function(){
+  var line1AnimateEl = line1Animate[0][0];
+  line1AnimateEl.endElement();
+});
+d3.select('#svgBegin').on('click', function(){
+  var line1AnimateEl = line1Animate[0][0];
+  line1AnimateEl.beginElement();
+});
+d3.select('#cssEnd').on('click', function(){
+  line2.style(browserPrefix + 'animation-play-state', 'paused');
+});
+d3.select('#cssBegin').on('click', function(){
+  line2.style(browserPrefix + 'animation-play-state', 'running');
+});
+d3.select('#jsEnd').on('click', function(){
+  line3Animation.running = false;
+  cancelAnimationFrame(line3Animation.animationId);
+});
+d3.select('#jsBegin').on('click', function(){
+  if(!line3Animation.running){
+    line3Animation.running = true;
+    requestAnimationFrame(line3Animation);
+  }
+});
+</script>
+</body>
+</html>
