@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../../libs/d3/d3.v3.min.js" language="JavaScript"></script>
+    <style type="text/css">
+      div{float:left;margin:0 10px 0 0;}
+      div h3{margin:0 0 5px;padding:0;}
+    </style>
+</head>
+<body>
+<div>
+  <h3>移动</h3>
+  <svg height="100px" width="100px">
+    <rect x="0" y="0" width="20" height="20" fill="#3498DB">
+      <animateTransform attributeName="transform" type="translate" values="0,0;80,0;80,80;0,80;0,0" dur="2000ms" repeatCount="indefinite"/>
+    </rect>
+  </svg>
+</div>
+<div>
+  <h3>旋转</h3>
+  <svg height="100px" width="100px">
+    <rect x="40" y="40" width="20" height="20" fill="#E67E22">
+      <animateTransform attributeName="transform" type="rotate" values="0,50,50;360,50,50" dur="2000ms" repeatCount="indefinite"/>
+    </rect>
+    <rect x="40" y="0" width="20" height="20" fill="#C0392B">
+      <animateTransform attributeName="transform" type="rotate" values="0,50,50;360,50,50" dur="2000ms" repeatCount="indefinite"/>
+    </rect>
+  </svg>
+</div>
+<div>
+  <h3>缩放</h3>
+  <svg height="100px" width="100px">
+    <rect x="0" y="0" width="20" height="20" fill="#F1C40F">
+      <animateTransform attributeName="transform" type="scale" values="1;5;1" dur="2000ms" repeatCount="indefinite"/>
+    </rect>
+  </svg>
+</div>
+<div>
+  <h3>倾斜</h3>
+  <svg height="100px" width="100px">
+    <rect x="50" y="0" width="50" height="50" fill="#95A5A6">
+      <animateTransform attributeName="transform" type="skewX" values="90;-270" dur="2000ms" repeatCount="indefinite"/>
+    </rect>
+    <rect x="0" y="50" width="50" height="50" fill="#BDC3C7">
+      <animateTransform attributeName="transform" type="skewY" values="90;-270" dur="2000ms" repeatCount="indefinite"/>
+    </rect>
+  </svg>
+</div>
+<script type="text/javascript">
+</script>
+</body>
+</html>
