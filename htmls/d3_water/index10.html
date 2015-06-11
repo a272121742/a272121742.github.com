@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../../libs/d3/d3.v3.min.js" language="JavaScript"></script>
+    <script src="../../libs/jquery/jquery.min.js" language="JavaScript"></script>
+</head>
+<body>
+<button class="start" value="1">200ms完成</button>
+<button class="start" value="5">1s完成</button>
+<button class="start" value="25">5s完成</button><br/>
+<svg width="500" height="100" style="border:2px solid blue">
+  <rect id="rect1" x="0" y="0" width="50" height="50" fill="#3498DB"></rect>
+  <text id="text1" x="0" y="35" style="font-size:12px;">0帧</text>
+  <rect id="rect2" x="0" y="50" width="50" height="50" fill="orange"></rect>
+  <text id="text2" x="0" y="85" style="font-size:12px;">0帧</text>
+</svg>
+<script type="text/javascript">
+  var rect1 = $(document.getElementById('rect1'));
+  var text1 = $(document.getElementById('text1'));
+  var rect2 = $(document.getElementById('rect2'));
+  var text2 = $(document.getElementById('text2'));
+  $('.start').click(function(){
+    rect1.attr('x', 0);
+    rect2.attr('x', 0);
+    text1.attr('x', 0).text('0帧');
+    text2.attr('x', 0).text('0帧');
+    var btn = $(this);
+    var k = parseInt(btn.val());
+    var i1 = 0;
+    var i2 = 0;
+    rect1.animate({
+      x : 400
+    },{
+      easing : 'linear',
+      duration : 200 * k,
+      step : function(now, fx){
+        rect1.attr('x', now);
+        text1.attr('x', parseFloat(now) + 5).html(++i1 + '帧数');
+      }
+    });
+    var id = setInterval(function(){
+      var x = parseInt(rect2.attr('x'));
+      if(x < 400){
+        rect2.attr('x', x + 10);
+        text2.attr('x', parseFloat(text2.attr('x')) + 10).html(++i2 + '帧数');
+      }else{
+        clearInterval(id);
+      }
+    }, 5 * k);
+  });
+</script>
+</body>
+</html>

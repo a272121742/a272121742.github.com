@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../../libs/d3/d3.v3.min.js" language="JavaScript"></script>
+</head>
+<body>
+<button id="start">开始</button>
+<span id="content" style="font-size:14px"></span><br/>
+<svg width="500" height="100" style="border:2px solid blue">
+  <rect id="rect1" x="0" y="0" width="50" height="50" fill="#3498DB">
+  </rect>
+  <rect id="rect2" x="0" y="50" width="50" height="50" fill="orange">
+  </rect>
+</svg>
+<script type="text/javascript">
+  var rect1 = d3.select('#rect1');
+  var rect2 = d3.select('#rect2');
+  var content = d3.select('#content');
+  d3.select('#start').on('click', function(){
+    rect1.attr('x', 0);
+    rect2.attr('x', 0);
+    var text = '';
+    content.text(text);
+    var begin = Date.now();
+    var i1 = 0;
+    var i2 = 0;
+    var id1 = setInterval(function(){
+      var x = parseInt(rect1.attr('x'));
+      if(x < 450){
+        ++i1;
+        rect1.attr('x', x + 1);
+      }else{
+        clearInterval(id1);
+        var time = Date.now() - begin;
+        text += '方1时间：' + time + 'ms；帧速：' + (time / i1) + ';';
+        content.text(text);
+      }
+    },1);
+    var id2 = setInterval(function(){
+      var x = parseInt(rect2.attr('x'));
+      if(x < 450){
+        ++i2;
+        rect2.attr('x', x + 1);
+      }else{
+        clearInterval(id2);
+        var time = Date.now() - begin;
+        text += '方2时间：' + time + 'ms；帧速：' + (time / i2) + ';';
+        content.text(text);
+      }
+    },4);
+  });
+</script>
+</body>
+</html>

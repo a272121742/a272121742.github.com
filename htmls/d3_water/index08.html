@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../../libs/d3/d3.v3.min.js" language="JavaScript"></script>
+    <style type="text/css">
+      div{float:left;margin:0 10px 0 0;}
+      div h3{margin:0 0 5px;padding:0;}
+    </style>
+</head>
+<body>
+<svg width="500" height="500" style="border:2px solid blue">
+  <g transform="matrix(0, -1, 1, 0, 250, 250)">
+    <rect x="-125" y="-125" width="250" height="250" fill="#3498DB">
+      <animate attributeName="width" values="0;250" dur="2s"></animate>
+      <animate id="init" attributeName="height" values="0;250" dur="2s"></animate>
+      <animateTransform begin="init.end" attributeName="transform" type="rotate" values="0;360" dur="2s" repeatCount="0"></animateTransform>
+    </rect>
+  </g>
+</svg>
+</body>
+</html>
