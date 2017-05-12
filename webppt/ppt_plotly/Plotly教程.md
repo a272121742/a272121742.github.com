@@ -863,7 +863,7 @@ class: center
 .right-column[
   ### 高性能
 
-  .autoWidth[![](plotly_vs_highcharts)]
+  .autoWidth[![](plotly_vs_highcharts.jpg)]
 ]
 
 ???
