@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html><head>
+  <title>WebGL Water</title>
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+<script src="OES_texture_float_linear-polyfill.js"></script>
+  <script src="lightgl.js"></script>
+  <script src="cubemap.js"></script>
+  <script src="renderer.js"></script>
+  <script src="water.js"></script>
+  <script src="main.js"></script>
+</head>
+  <body onload="showWebGLWater">
+    <div id="WebGL_Water_Loading">正在加载...</div>
+    <div id="WebGL_Water">
+    </div>
+    <img id="tiles" src="tiles.jpg" style="display: none;">
+    <img id="xneg" src="xneg.jpg" style="display: none;">
+    <img id="xpos" src="xpos.jpg" style="display: none;">
+    <img id="ypos" src="ypos.jpg" style="display: none;">
+    <img id="zneg" src="zneg.jpg" style="display: none;">
+    <img id="zpos" src="zpos.jpg" style="display: none;">
+  </body>
+  <script type="text/javascript">
+    showWebGLWater();
+  </script>
+</html>
