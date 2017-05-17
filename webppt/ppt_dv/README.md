@@ -1,0 +1,1 @@
+原文摘至[http://www.taihuwang.com/shuma/bencandy-htm-fid-49-id-5933.html](http://www.taihuwang.com/shuma/bencandy-htm-fid-49-id-5933.html)，本人仅作学习引用，已作明出处。
