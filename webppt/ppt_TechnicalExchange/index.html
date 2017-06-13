@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Animate.css测试</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="../lib/remark/remark.css">
+    <link rel="stylesheet" type="text/css" href="../lib/animate/animate.css">
+    <style type="text/css">
+      * {
+        font-family: "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, Verdana, sans-serif;
+      }
+      /*角标*/
+      .footer{
+        position: absolute;
+        opacity: .6;
+        font-size: 14px;
+        bottom: 12px;
+        left: 20px;
+        font-style:italic;
+      }
+      .slide-row {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        line-height: 0.8em;
+      }
+      .slide-row .slide-col-4,
+      .slide-row .slide-col-3,
+      .slide-row .slide-col-2,
+      .slide-row .slide-col-1{
+        float: left;
+        margin: 12px 0px;
+      }
+      .slide-col-4{
+        width:100%;
+      }
+      .slide-col-3{
+        width: 75%;
+      }
+      .slide-col-2{
+        width: 50%;
+      }
+      .slide-col-1{
+        width: 25%;
+      }
+      .inverse {
+        background: #272822;
+        color: #777872;
+        text-shadow: 0 0 20px #333;
+      }
+    </style>
+    <script src="../lib/jquery/jquery-1.9.1.min.js" type="text/javascript"></script>
+    <script src="../lib/remark/remark-latest.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+        window.slideshow = remark.create({
+          ratio: '16:9',
+          // ratio: '4:3',
+          sourceUrl : 'markdown.md',
+          highlightLanguage: 'javascript',
+          highlightStyle: 'monokai',
+          highlightLines: true,
+          highlightSpans: true
+        }, function(){
+          var head= document.getElementsByTagName('head')[0]; 
+          var script= document.createElement('script'); 
+          script.type= 'text/javascript'; 
+          script.src= 'index.js'; 
+          head.appendChild(script); 
+        });
+      });
+    </script>
+  </head>
+  <body>
+    
+  </body>
+</html>
