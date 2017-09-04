@@ -1,0 +1,42 @@
+* {
+  font-family: "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, Verdana, sans-serif;
+}
+/*角标*/
+.footer{
+  position: absolute;
+  opacity: .6;
+  font-size: 14px;
+  bottom: 12px;
+  left: 20px;
+  font-style:italic;
+}
+.slide-row {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  line-height: 0.8em;
+}
+.slide-row .slide-col-4,
+.slide-row .slide-col-3,
+.slide-row .slide-col-2,
+.slide-row .slide-col-1{
+  float: left;
+  margin: 12px 0px;
+}
+.slide-col-4{
+  width:100%;
+}
+.slide-col-3{
+  width: 75%;
+}
+.slide-col-2{
+  width: 50%;
+}
+.slide-col-1{
+  width: 25%;
+}
+.inverse {
+  background: #272822;
+  color: #777872;
+  text-shadow: 0 0 20px #333;
+}
