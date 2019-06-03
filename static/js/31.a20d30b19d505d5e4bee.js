@@ -1,0 +1,2 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[31],{QcRt:function(e,t,n){"use strict";n.r(t);function a(){var e=this,t=e.$createElement;return(e._self._c||t)("a-table",{attrs:{"row-key":function(e,t){return t},"data-source":e.data,columns:e.columns,pagination:{pageSize:Number.MAX_SAFE_INTEGER},size:"small",bordered:""}})}a._withStripped=!0;var o={},r=n("KHd+"),s=Object(r.a)(o,a,[],!1,null,null,null);s.options.__file="src/modules/demo/view/InoutVars.vue";t.default=s.exports}}]);
+//# sourceMappingURL=31.a20d30b19d505d5e4bee.js.map

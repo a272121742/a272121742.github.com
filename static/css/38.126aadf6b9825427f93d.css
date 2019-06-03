@@ -1,0 +1,1 @@
+.ant-table-wrapper /deep/ .ant-table table{width:100%;table-layout:fixed;word-wrap:break-all}.ant-table-wrapper /deep/ .ant-table td,.ant-table-wrapper /deep/ .ant-table th>div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;word-break:keep-all}
